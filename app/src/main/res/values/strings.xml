@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="movie_image">Movie Image</string>
+    <string name="popular_filter">popular</string>
+    <string name="top_rated_filter">top_rated</string>
+    <string name="movie_cover">Movie Cover</string>
+    <string name="john_wick">John Wick</string>
+    <string name="overview_label">Overview</string>
+    <string name="overview_text">Ex-hitman John Wick comes out of retirement to track down the gangsters that took everything from him.</string>
+    <string name="release_date">Release Date</string>
+    <string name="user_count">User Count</string>
+    <string name="user_rating">User rating</string>
+    <string name="share">Share</string>
+    <string name="add_to_favorite">Add to Favorite</string>
+    <string name="vote_count">Vote Count</string>
+    <string name="movie_details">Movie Details</string>
+    <string name="favorite_clicked">Favorite Clicked!</string>
+    <string name="share_clicked">Share Clicked!</string>
+</resources>
