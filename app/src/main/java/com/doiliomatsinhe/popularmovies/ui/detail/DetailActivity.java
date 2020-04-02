@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,6 +16,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.doiliomatsinhe.popularmovies.R;
+import com.doiliomatsinhe.popularmovies.Utils;
+import com.doiliomatsinhe.popularmovies.adapter.TrailerAdapter;
 import com.doiliomatsinhe.popularmovies.databinding.ActivityDetailBinding;
 import com.doiliomatsinhe.popularmovies.model.Movie;
 import com.doiliomatsinhe.popularmovies.model.MovieRepository;
@@ -21,16 +25,19 @@ import com.doiliomatsinhe.popularmovies.model.Review;
 import com.doiliomatsinhe.popularmovies.model.Trailer;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.doiliomatsinhe.popularmovies.ui.main.MainActivity.MOVIE;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerItemClickListener {
 
     private ActivityDetailBinding binding;
-    private DetailViewModelFactory factory;
-    private DetailViewModel viewModel;
     private static final String TAG = "DetailActivity";
+    private TrailerAdapter trailerAdapter;
+
+    private List<Trailer> trailerList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,14 +72,16 @@ public class DetailActivity extends AppCompatActivity {
 
     private void prepareDetailViewModel(Integer id) {
         MovieRepository repository = new MovieRepository(getString(R.string.api_key));
-        factory = new DetailViewModelFactory(repository, id);
-        viewModel = new ViewModelProvider(this, factory).get(DetailViewModel.class);
+        DetailViewModelFactory factory = new DetailViewModelFactory(repository, id);
+        DetailViewModel viewModel = new ViewModelProvider(this, factory).get(DetailViewModel.class);
+
+        initAdapters();
 
         viewModel.trailersList.observe(this, new Observer<List<Trailer>>() {
             @Override
             public void onChanged(List<Trailer> trailers) {
-                Log.d(TAG, "onChanged: tamanho: " + trailers.size());
-                Log.d(TAG, "onChanged: nome: " + trailers.get(0).getName());
+                trailerAdapter.setTrailerList(trailers);
+                trailerList = trailers;
             }
         });
         viewModel.reviewsList.observe(this, new Observer<List<Review>>() {
@@ -83,6 +92,14 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void initAdapters() {
+        trailerAdapter = new TrailerAdapter(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        binding.trailerRecycler.setLayoutManager(layoutManager);
+        binding.trailerRecycler.setHasFixedSize(true);
+        binding.trailerRecycler.setAdapter(trailerAdapter);
     }
 
     @Override
@@ -98,10 +115,32 @@ public class DetailActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.favorite_clicked, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.ic_share:
-                Toast.makeText(this, R.string.share_clicked, Toast.LENGTH_SHORT).show();
+                shareMovie();
                 break;
 
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void shareMovie() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        String firstTrailer = "https://www.youtube.com/watch?v=" + trailerList.get(0).getKey();
+        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.movie_sharing) + " "+firstTrailer);
+        i.setType("text/plain");
+        if (i.resolveActivity(getPackageManager()) != null) {
+            startActivity(Intent.createChooser(i, getString(R.string.share_using)));
+        }
+    }
+
+    @Override
+    public void onTrailerItemClick(int position) {
+        Trailer trailer = trailerList.get(position);
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(String.format("https://www.youtube.com/watch?v=%s", trailer.getKey())));
+        if (Utils.isAppInstalled(this, "com.google.android.youtube")) {
+            i.setPackage("com.google.android.youtube");
+        }
+        startActivity(i);
+    }
+
 }

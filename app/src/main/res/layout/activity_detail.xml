@@ -126,11 +126,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:contentDescription="@string/user_count"
                         app:layout_constraintEnd_toEndOf="@+id/user_rating_count"
                         app:layout_constraintStart_toStartOf="@+id/user_rating_count"
                         app:layout_constraintTop_toBottomOf="@+id/user_rating_count"
-                        app:srcCompat="@drawable/ic_group_black_24dp"
-                        android:contentDescription="@string/user_count" />
+                        app:srcCompat="@drawable/ic_group_black_24dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -156,10 +156,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
                         android:text="@string/user_rating"
                         android:textColor="@color/colorPrimaryDark"
                         android:textStyle="bold"
-                        android:layout_marginBottom="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@+id/imageView8"
                         app:layout_constraintStart_toStartOf="@+id/imageView8"
@@ -174,9 +174,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:cardElevation="2dp"
-                android:layout_marginBottom="16dp"
                 app:cardPreventCornerOverlap="true"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cardview">
@@ -203,6 +201,31 @@
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/trailers_label"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardview2" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/trailer_recycler"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:itemCount="1"
+                app:layout_constraintTop_toBottomOf="@+id/textView2"
+                tools:listitem="@layout/trailer_item" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

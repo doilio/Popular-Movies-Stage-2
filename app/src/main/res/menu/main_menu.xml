@@ -4,8 +4,11 @@
 
     <item
         android:id="@+id/ic_popular"
-        android:title="Most Popular" />
+        android:title="@string/most_popular" />
     <item
         android:id="@+id/ic_rating"
-        android:title="Highest Rated" />
+        android:title="@string/highest_rated" />
+    <item
+        android:id="@+id/ic_favorites"
+        android:title="@string/favorites" />
 </menu>
