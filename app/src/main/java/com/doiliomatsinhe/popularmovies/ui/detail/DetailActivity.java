@@ -3,9 +3,12 @@ package com.doiliomatsinhe.popularmovies.ui.detail;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -13,18 +16,26 @@ import android.widget.Toast;
 import com.doiliomatsinhe.popularmovies.R;
 import com.doiliomatsinhe.popularmovies.databinding.ActivityDetailBinding;
 import com.doiliomatsinhe.popularmovies.model.Movie;
+import com.doiliomatsinhe.popularmovies.model.MovieRepository;
+import com.doiliomatsinhe.popularmovies.model.Trailer;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import static com.doiliomatsinhe.popularmovies.ui.main.MainActivity.MOVIE;
 
 public class DetailActivity extends AppCompatActivity {
 
     private ActivityDetailBinding binding;
+    private DetailViewModelFactory factory;
+    private DetailViewModel viewModel;
+    private static final String TAG = "DetailActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+
 
         Intent i = getIntent();
         if (i != null) {
@@ -35,7 +46,9 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+
     private void populateUI(Movie movie) {
+        Log.d("DetailActivity", "populateUI: " + movie.getId());
         Picasso.get().load(movie.getBackdropPath()).into(binding.movieCover);
         Picasso.get().load(movie.getPosterPath()).into(binding.moviePoster);
         binding.movieTitle.setText(movie.getTitle());
@@ -43,6 +56,25 @@ public class DetailActivity extends AppCompatActivity {
         binding.userRatingCount.setText(String.valueOf(movie.getVoteCount()));
         binding.releaseDateText.setText(movie.getReleaseDate());
         binding.overviewText.setText(movie.getOverview());
+
+        // Prepare DetailViewModel
+        prepareDetailViewModel(movie.getId());
+    }
+
+
+    private void prepareDetailViewModel(Integer id) {
+        MovieRepository repository = new MovieRepository(getString(R.string.api_key));
+        factory = new DetailViewModelFactory(repository, id);
+        viewModel = new ViewModelProvider(this, factory).get(DetailViewModel.class);
+
+        viewModel.trailersList.observe(this, new Observer<List<Trailer>>() {
+            @Override
+            public void onChanged(List<Trailer> trailers) {
+                Log.d(TAG, "onChanged: tamanho: " + trailers.size());
+                Log.d(TAG, "onChanged: nome: " + trailers.get(0).getName());
+            }
+        });
+
     }
 
     @Override

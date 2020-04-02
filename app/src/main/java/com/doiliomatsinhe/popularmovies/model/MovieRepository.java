@@ -24,4 +24,9 @@ public class MovieRepository {
         return service.getMovies(categoria, key, LANGUAGE, PAGE);
     }
 
+
+    public Call<TrailerResponse> getTrailers(int movieId) {
+        return service.getTrailers(movieId, key, LANGUAGE);
+    }
+
 }
