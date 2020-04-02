@@ -17,6 +17,7 @@ import com.doiliomatsinhe.popularmovies.R;
 import com.doiliomatsinhe.popularmovies.databinding.ActivityDetailBinding;
 import com.doiliomatsinhe.popularmovies.model.Movie;
 import com.doiliomatsinhe.popularmovies.model.MovieRepository;
+import com.doiliomatsinhe.popularmovies.model.Review;
 import com.doiliomatsinhe.popularmovies.model.Trailer;
 import com.squareup.picasso.Picasso;
 
@@ -72,6 +73,13 @@ public class DetailActivity extends AppCompatActivity {
             public void onChanged(List<Trailer> trailers) {
                 Log.d(TAG, "onChanged: tamanho: " + trailers.size());
                 Log.d(TAG, "onChanged: nome: " + trailers.get(0).getName());
+            }
+        });
+        viewModel.reviewsList.observe(this, new Observer<List<Review>>() {
+            @Override
+            public void onChanged(List<Review> reviews) {
+                Log.d(TAG, "onChanged: tamanho de reviews: " + reviews.size());
+                Log.d(TAG, "onChanged: reviewer: " + reviews.get(0).getAuthor());
             }
         });
 

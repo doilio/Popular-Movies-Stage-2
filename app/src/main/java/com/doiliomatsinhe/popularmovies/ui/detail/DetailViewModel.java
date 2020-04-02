@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.doiliomatsinhe.popularmovies.model.MovieRepository;
+import com.doiliomatsinhe.popularmovies.model.Review;
+import com.doiliomatsinhe.popularmovies.model.ReviewResponse;
 import com.doiliomatsinhe.popularmovies.model.Trailer;
 import com.doiliomatsinhe.popularmovies.model.TrailerResponse;
 
@@ -23,10 +25,31 @@ public class DetailViewModel extends ViewModel {
     private MutableLiveData<List<Trailer>> _trailersList = new MutableLiveData<>();
     public LiveData<List<Trailer>> trailersList = _trailersList;
 
+    private MutableLiveData<List<Review>> _reviewsList = new MutableLiveData<>();
+    public LiveData<List<Review>> reviewsList = _reviewsList;
 
     public DetailViewModel(MovieRepository repository, int movieId) {
         this.repository = repository;
         getTrailers(movieId);
+        getReviews(movieId);
+    }
+
+    private void getReviews(int movieId) {
+        repository.getReviews(movieId).enqueue(new Callback<ReviewResponse>() {
+            @Override
+            public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
+                if (response.body() != null) {
+                    ReviewResponse reviewResponse = response.body();
+
+                    List<Review> listOfReviews = new ArrayList<>(reviewResponse.getResults());
+                    _reviewsList.setValue(listOfReviews);
+                }
+            }
+            @Override
+            public void onFailure(Call<ReviewResponse> call, Throwable t) {
+                Log.d("DetailViewModel", "Review: " + t.getMessage());
+            }
+        });
     }
 
     private void getTrailers(int movieId) {
@@ -35,7 +58,6 @@ public class DetailViewModel extends ViewModel {
             public void onResponse(Call<TrailerResponse> call, Response<TrailerResponse> response) {
                 if (response.body() != null) {
                     TrailerResponse trailerResponse = response.body();
-                    List<Trailer> trailerList = trailerResponse.getResults();
 
                     List<Trailer> listOfTrailers = new ArrayList<>(trailerResponse.getResults());
                     _trailersList.setValue(listOfTrailers);

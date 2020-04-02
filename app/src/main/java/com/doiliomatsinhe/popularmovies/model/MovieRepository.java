@@ -24,9 +24,12 @@ public class MovieRepository {
         return service.getMovies(categoria, key, LANGUAGE, PAGE);
     }
 
-
     public Call<TrailerResponse> getTrailers(int movieId) {
         return service.getTrailers(movieId, key, LANGUAGE);
+    }
+
+    public Call<ReviewResponse> getReviews(int movieId) {
+        return service.getReviews(movieId, key, LANGUAGE, PAGE);
     }
 
 }
