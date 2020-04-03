@@ -1,11 +1,14 @@
 package com.doiliomatsinhe.popularmovies.ui.main;
 
+import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.doiliomatsinhe.popularmovies.data.MovieDao;
+import com.doiliomatsinhe.popularmovies.data.MovieDatabase;
 import com.doiliomatsinhe.popularmovies.model.Movie;
 import com.doiliomatsinhe.popularmovies.data.MovieRepository;
 import com.doiliomatsinhe.popularmovies.model.MovieResponse;
@@ -28,10 +31,18 @@ public class MainViewModel extends ViewModel {
 
     public void setFilter(String filter) { this.filter = filter; }
 
-    public MainViewModel(MovieRepository repository) {
+    private LiveData<List<Movie>> favoritesList;
+
+    public MainViewModel(MovieRepository repository, Application application) {
         this.repository = repository;
+        MovieDao database = MovieDatabase.getInstance(application).movieDao();
+        favoritesList = database.getAllFavorites();
+
     }
 
+    public LiveData<List<Movie>> getFavoritesList() {
+        return favoritesList;
+    }
 
     /**
      * Gets a list of Movies by making an Asynchronous call with Retrofit.

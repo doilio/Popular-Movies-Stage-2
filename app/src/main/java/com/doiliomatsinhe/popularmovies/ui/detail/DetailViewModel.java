@@ -6,7 +6,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.doiliomatsinhe.popularmovies.data.MovieDatabase;
 import com.doiliomatsinhe.popularmovies.data.MovieRepository;
+import com.doiliomatsinhe.popularmovies.model.Movie;
 import com.doiliomatsinhe.popularmovies.model.Review;
 import com.doiliomatsinhe.popularmovies.model.ReviewResponse;
 import com.doiliomatsinhe.popularmovies.model.Trailer;
@@ -22,22 +24,31 @@ import retrofit2.Response;
 public class DetailViewModel extends ViewModel {
 
     private MovieRepository repository;
+
     private MutableLiveData<List<Trailer>> _trailersList = new MutableLiveData<>();
     public LiveData<List<Trailer>> trailersList = _trailersList;
 
     private MutableLiveData<List<Review>> _reviewsList = new MutableLiveData<>();
     public LiveData<List<Review>> reviewsList = _reviewsList;
 
-    public DetailViewModel(MovieRepository repository, int movieId) {
+    private LiveData<Movie> favorite;
+
+    public DetailViewModel(MovieRepository repository, int movieId, MovieDatabase database) {
         this.repository = repository;
         getTrailers(movieId);
         getReviews(movieId);
+
+        favorite = database.movieDao().getFavoriteById(movieId);
+    }
+
+    public LiveData<Movie> getFavorite() {
+        return favorite;
     }
 
     /**
      * Gets a list of Reviews by making an Asynchronous call with Retrofit.
-     * @param movieId identifies a movie uniquely and returns data about it
      *
+     * @param movieId identifies a movie uniquely and returns data about it
      */
     private void getReviews(int movieId) {
         repository.getReviews(movieId).enqueue(new Callback<ReviewResponse>() {
@@ -50,6 +61,7 @@ public class DetailViewModel extends ViewModel {
                     _reviewsList.setValue(listOfReviews);
                 }
             }
+
             @Override
             public void onFailure(Call<ReviewResponse> call, Throwable t) {
                 Log.d("DetailViewModel", "Review: " + t.getMessage());
@@ -59,8 +71,8 @@ public class DetailViewModel extends ViewModel {
 
     /**
      * Gets a list of Trailers by making an Asynchronous call with Retrofit.
-     * @param movieId identifies a movie uniquely and returns data about it
      *
+     * @param movieId identifies a movie uniquely and returns data about it
      */
     private void getTrailers(int movieId) {
         repository.getTrailers(movieId).enqueue(new Callback<TrailerResponse>() {

@@ -10,6 +10,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private ActivityMainBinding binding;
     private List<Movie> movieList = new ArrayList<>();
     public static final String MOVIE = "Movie";
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +106,24 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         // Initializing the repository, factory and the ViewModel
         MovieRepository repository = new MovieRepository(getString(R.string.api_key));
-        MainViewModelFactory factory = new MainViewModelFactory(repository);
+        MainViewModelFactory factory = new MainViewModelFactory(repository,getApplication());
         viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
+
+        viewModel.getFavoritesList().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(List<Movie> movies) {
+                if (!movies.isEmpty()){
+                    Movie movie = movies.get(0);
+                    Log.d(TAG, "DB Movie Titulo: "+movie.getTitle());
+                    Log.d(TAG, "DB Movie Id: "+movie.getId());
+                    Log.d(TAG, "DB Movie Photo: "+movie.getBackdropPath());
+                    Log.d(TAG, "DB Movie Tamanho: "+movies.size());
+                    //must be null
+                    Log.d(TAG, "DB Movie Video: "+movie.getVideo());
+                }
+
+            }
+        });
     }
 
     @Override

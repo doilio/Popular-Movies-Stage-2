@@ -1,41 +1,53 @@
 package com.doiliomatsinhe.popularmovies.model;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "favorites")
 public class Movie implements Serializable {
 
     private static final String BASE_URL = "http://image.tmdb.org/t/p/w342/";
+
+    @Ignore
     @SerializedName("popularity")
     @Expose
     private Double popularity;
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
+    @Ignore
     @SerializedName("video")
     @Expose
     private Boolean video;
     @SerializedName("poster_path")
     @Expose
     private String posterPath;
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private Integer id;
+    @Ignore
     @SerializedName("adult")
     @Expose
     private Boolean adult;
     @SerializedName("backdrop_path")
     @Expose
     private String backdropPath;
+    @Ignore
     @SerializedName("original_language")
     @Expose
     private String originalLanguage;
     @SerializedName("original_title")
     @Expose
     private String originalTitle;
+    @Ignore
     @SerializedName("genre_ids")
     @Expose
     private List<Integer> genreIds = null;
@@ -164,4 +176,14 @@ public class Movie implements Serializable {
         this.releaseDate = releaseDate;
     }
 
+    public Movie(Integer voteCount, String posterPath, Integer id, String backdropPath, String title, Double voteAverage, String overview, String releaseDate) {
+        this.voteCount = voteCount;
+        this.posterPath = posterPath;
+        this.id = id;
+        this.backdropPath = backdropPath;
+        this.title = title;
+        this.voteAverage = voteAverage;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+    }
 }
