@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.doiliomatsinhe.popularmovies.AppExecutors;
 import com.doiliomatsinhe.popularmovies.R;
@@ -43,7 +44,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private List<Review> reviewList = new ArrayList<>();
 
     private Movie movie;
-    private int movieId;
     private DetailViewModel viewModel;
 
     // Local Database Members
@@ -60,16 +60,13 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             if (movie != null) {
                 populateUI(movie);
 
-                movieId = movie.getId();
-                setupViewModel(movieId);
+                setupViewModel(movie.getId());
             }
         }
 
         initAdapters();
 
         initLists();
-
-
     }
 
     private void initLists() {
@@ -117,7 +114,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         binding.releaseDateText.setText(movie.getReleaseDate());
         binding.overviewText.setText(movie.getOverview());
 
-
     }
 
 
@@ -151,10 +147,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                             Log.d(TAG, "This Movie is being deleted from favorites" + movie.getTitle());
                             removeFromFavorites(movie);
                             favoriteItem.setIcon(R.drawable.ic_favorite_border_black_24dp);
+                            Toast.makeText(DetailActivity.this, R.string.remove_from_favorites, Toast.LENGTH_SHORT).show();
                         } else {
                             addToFavorites();
                             favoriteItem.setIcon(R.drawable.ic_favorite_black_24dp);
                             Log.d(TAG, "This movie was Added to Favorites");
+                            Toast.makeText(DetailActivity.this, R.string.add_to_favorites, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

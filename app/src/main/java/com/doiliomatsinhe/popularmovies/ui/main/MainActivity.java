@@ -64,26 +64,42 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 filter = getString(R.string.top_rated_filter);
                 recoverMovies(filter);
                 break;
+            case R.id.ic_favorites:
+                filter = getString(R.string.favorites_filter);
+                recoverMovies(filter);
         }
         return super.onOptionsItemSelected(item);
     }
 
     /**
      * Gets the Movie from the API Using Separation of Concerns.
+     *
      * @param category is a filter used to know what list it will load.
      */
     private void recoverMovies(String category) {
         binding.swipeRefresh.setRefreshing(true);
         viewModel.setFilter(category);
-        viewModel.getMovies(category).observe(this, new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(List<Movie> movies) {
-                adapter.setMovieList(movies);
-                binding.swipeRefresh.setRefreshing(false);
-                movieList = movies;
+        if (category.equals(getString(R.string.favorites_filter))) {
+            viewModel.getFavoritesList().observe(this, new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(List<Movie> movies) {
+                    adapter.setMovieList(movies);
+                    binding.swipeRefresh.setRefreshing(false);
+                    movieList = movies;
+                }
+            });
+        } else {
+            viewModel.getMovies(category).observe(this, new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(List<Movie> movies) {
+                    adapter.setMovieList(movies);
+                    binding.swipeRefresh.setRefreshing(false);
+                    movieList = movies;
 
-            }
-        });
+                }
+            });
+        }
+
     }
 
     /**
@@ -106,20 +122,18 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         // Initializing the repository, factory and the ViewModel
         MovieRepository repository = new MovieRepository(getString(R.string.api_key));
-        MainViewModelFactory factory = new MainViewModelFactory(repository,getApplication());
+        MainViewModelFactory factory = new MainViewModelFactory(repository, getApplication());
         viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
 
         viewModel.getFavoritesList().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(List<Movie> movies) {
-                if (!movies.isEmpty()){
+                if (!movies.isEmpty()) {
                     Movie movie = movies.get(0);
-                    Log.d(TAG, "DB Movie Titulo: "+movie.getTitle());
-                    Log.d(TAG, "DB Movie Id: "+movie.getId());
-                    Log.d(TAG, "DB Movie Photo: "+movie.getBackdropPath());
-                    Log.d(TAG, "DB Movie Tamanho: "+movies.size());
-                    //must be null
-                    Log.d(TAG, "DB Movie Video: "+movie.getVideo());
+                    Log.d(TAG, "DB Movie Titulo: " + movie.getTitle());
+                    Log.d(TAG, "DB Movie Id: " + movie.getId());
+                    Log.d(TAG, "DB Movie Photo: " + movie.getBackdropPath());
+                    Log.d(TAG, "DB Movie Tamanho: " + movies.size());
                 }
 
             }
@@ -135,16 +149,21 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
      * Method to decide what list to show after rotation has occurred.
      */
     private void decideWhatToShow() {
+        //Check the filter
         if (viewModel.getFilter() == null) {
             viewModel.setFilter(getString(R.string.popular_filter));
             recoverMovies(viewModel.getFilter());
         } else {
             recoverMovies(viewModel.getFilter());
         }
+        // Set the filter
         if (viewModel.getFilter().equalsIgnoreCase(getString(R.string.popular_filter))) {
             recoverMovies(getString(R.string.popular_filter));
-        } else {
+        } else if (viewModel.getFilter().equalsIgnoreCase(getString(R.string.top_rated_filter))) {
             recoverMovies(getString(R.string.top_rated_filter));
+        } else {
+            //DataBase
+            recoverMovies(getString(R.string.favorites_filter));
         }
     }
 
