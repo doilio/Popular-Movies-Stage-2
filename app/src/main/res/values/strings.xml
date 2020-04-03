@@ -28,4 +28,6 @@
     <string name="add_to_favorites">Added to Favorites!</string>
     <string name="remove_from_favorites">Removed from Favorites!</string>
     <string name="favorites_filter">favorites_filter</string>
+    <string name="cant_share_from_favorites">Can\'t share from favorites</string>
+    <string name="try_again_share">Try again when connected to the internet!</string>
 </resources>

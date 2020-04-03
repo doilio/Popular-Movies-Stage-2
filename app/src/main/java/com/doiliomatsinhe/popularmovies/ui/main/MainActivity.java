@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private ActivityMainBinding binding;
     private List<Movie> movieList = new ArrayList<>();
     public static final String MOVIE = "Movie";
-    private static final String TAG = "MainActivity";
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         decideWhatToShow();
 
+        Log.d(TAG, "onCreate: "+viewModel.getFilter());
     }
 
     @Override

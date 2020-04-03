@@ -7,12 +7,15 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.doiliomatsinhe.popularmovies.AppExecutors;
@@ -28,6 +31,7 @@ import com.doiliomatsinhe.popularmovies.model.Review;
 import com.doiliomatsinhe.popularmovies.model.Trailer;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,14 +109,42 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
      * @param movie to use to populate fields
      */
     private void populateUI(Movie movie) {
-        Log.d(TAG, "populateUI: " + movie.getId());
-        Picasso.get().load(movie.getBackdropPath()).into(binding.movieCover);
-        Picasso.get().load(movie.getPosterPath()).into(binding.moviePoster);
-        binding.movieTitle.setText(movie.getTitle());
-        binding.movieRating.setText(String.valueOf(movie.getVoteAverage()));
-        binding.userRatingCount.setText(String.valueOf(movie.getVoteCount()));
-        binding.releaseDateText.setText(movie.getReleaseDate());
-        binding.overviewText.setText(movie.getOverview());
+        if (movie.getVideo() != null) {
+            // Populate from Internet
+            Log.d(TAG, "populateUI: " + movie.getId());
+            Picasso.get().load(movie.getBackdropPath()).into(binding.movieCover);
+            Picasso.get().load(movie.getPosterPath()).into(binding.moviePoster);
+            binding.movieTitle.setText(movie.getTitle());
+            binding.movieRating.setText(String.valueOf(movie.getVoteAverage()));
+            binding.userRatingCount.setText(String.valueOf(movie.getVoteCount()));
+            binding.releaseDateText.setText(movie.getReleaseDate());
+            binding.overviewText.setText(movie.getOverview());
+        } else {
+
+            // Loading Images from Internal Storage
+            ContextWrapper cw = new ContextWrapper(this);
+            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+            File posterFile = new File(directory, movie.getTitle() + "poster.jpeg");
+            File backdropFile = new File(directory, movie.getTitle() + "backdrop.jpeg");
+            Picasso.get().load(posterFile).into(binding.moviePoster);
+            Picasso.get().load(backdropFile).into(binding.movieCover);
+
+            // Populate Fields
+            binding.movieTitle.setText(movie.getTitle());
+            binding.movieRating.setText(String.valueOf(movie.getVoteAverage()));
+            binding.userRatingCount.setText(String.valueOf(movie.getVoteCount()));
+            binding.releaseDateText.setText(movie.getReleaseDate());
+            binding.overviewText.setText(movie.getOverview());
+
+            //Hide Review and Trailers
+            binding.reviewLabel.setVisibility(View.GONE);
+            binding.trailerLabel.setVisibility(View.GONE);
+
+            binding.reviewRecycler.setVisibility(View.GONE);
+            binding.trailerRecycler.setVisibility(View.GONE);
+
+        }
+
 
     }
 
@@ -188,13 +220,31 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.home) {
+            onBackPressed();
+        }
         if (item.getItemId() == R.id.ic_share) {
-            shareMovie();
+            if (movie.getVideo() != null) {
+                shareMovie();
+            } else {
+                Toast.makeText(this, R.string.cant_share_from_favorites, Toast.LENGTH_SHORT).show();
+            }
+
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void removeFromFavorites(final Movie movie) {
+
+        // Delete Images from Storage
+        ContextWrapper cw = new ContextWrapper(this);
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        File posterPath = new File(directory, movie.getTitle() + "poster.jpeg");
+        File backdropPath = new File(directory, movie.getTitle() + "backdrop.jpeg");
+        if (posterPath.delete() && backdropPath.delete()) {
+            Log.d(TAG, "images on the disk deleted successfully!");
+        }
+
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -214,6 +264,11 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             double voteAverage = movie.getVoteAverage();
             String overview = movie.getOverview();
             String releaseDate = movie.getReleaseDate();
+
+            // Download Images Poster and BackDrop
+            Picasso.get().load(movie.getPosterPath()).into(Utils.picassoImageTarget(binding.getRoot().getContext(), "imageDir", movie.getTitle() + "poster.jpeg"));
+            Picasso.get().load(movie.getBackdropPath()).into(Utils.picassoImageTarget(binding.getRoot().getContext(), "imageDir", movie.getTitle() + "backdrop.jpeg"));
+
             final Movie movie = new Movie(voteCount, posterPath, id, backdropPath, title, voteAverage, overview, releaseDate);
 
             AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -233,13 +288,18 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
      * Metthod to share first Trailer
      */
     private void shareMovie() {
-        Intent i = new Intent(Intent.ACTION_SEND);
-        String firstTrailer = "https://www.youtube.com/watch?v=" + trailerList.get(0).getKey();
-        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.movie_sharing) + " " + firstTrailer);
-        i.setType("text/plain");
-        if (i.resolveActivity(getPackageManager()) != null) {
-            startActivity(Intent.createChooser(i, getString(R.string.share_using)));
+        if (!trailerList.isEmpty()){
+            Intent i = new Intent(Intent.ACTION_SEND);
+            String firstTrailer = "https://www.youtube.com/watch?v=" + trailerList.get(0).getKey();
+            i.putExtra(Intent.EXTRA_TEXT, getString(R.string.movie_sharing) + " " + firstTrailer);
+            i.setType("text/plain");
+            if (i.resolveActivity(getPackageManager()) != null) {
+                startActivity(Intent.createChooser(i, getString(R.string.share_using)));
+            }
+        }else{
+            Toast.makeText(this, R.string.try_again_share, Toast.LENGTH_SHORT).show();
         }
+
     }
 
     /**
@@ -274,5 +334,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         i.setData(Uri.parse(review.getUrl()));
         startActivity(i);
 
+    }
+
+    /**
+     * Replaces the default navigateUp action.
+     * So that It can avoid loading the list again, it will already be there.
+     */
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return false;
     }
 }
