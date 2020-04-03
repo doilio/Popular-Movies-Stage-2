@@ -3,12 +3,11 @@ package com.doiliomatsinhe.popularmovies.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.doiliomatsinhe.popularmovies.R;
+import com.doiliomatsinhe.popularmovies.databinding.MovieItemBinding;
 import com.doiliomatsinhe.popularmovies.model.Movie;
 import com.squareup.picasso.Picasso;
 
@@ -25,16 +24,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageView movieImage;
+        private MovieItemBinding binding;
 
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            movieImage = itemView.findViewById(R.id.movie_image);
-            itemView.setOnClickListener(this);
+        ViewHolder(@NonNull MovieItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            binding.getRoot().setOnClickListener(this);
         }
 
         void bind(Movie movie) {
-            Picasso.get().load(movie.getPosterPath()).into(movieImage);
+            Picasso.get().load(movie.getPosterPath()).into(binding.movieImage);
+
+            binding.executePendingBindings();
         }
 
         @Override
@@ -52,8 +53,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_item, parent, false);
-        return new ViewHolder(view);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        MovieItemBinding binding = MovieItemBinding.inflate(inflater, parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override

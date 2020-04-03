@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.doiliomatsinhe.popularmovies.R;
 import com.doiliomatsinhe.popularmovies.Utils;
+import com.doiliomatsinhe.popularmovies.adapter.ReviewAdapter;
 import com.doiliomatsinhe.popularmovies.adapter.TrailerAdapter;
 import com.doiliomatsinhe.popularmovies.databinding.ActivityDetailBinding;
 import com.doiliomatsinhe.popularmovies.model.Movie;
@@ -30,13 +31,15 @@ import java.util.List;
 
 import static com.doiliomatsinhe.popularmovies.ui.main.MainActivity.MOVIE;
 
-public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerItemClickListener {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerItemClickListener, ReviewAdapter.ReviewItemClickListener {
 
     private ActivityDetailBinding binding;
     private static final String TAG = "DetailActivity";
     private TrailerAdapter trailerAdapter;
+    private ReviewAdapter reviewAdapter;
 
     private List<Trailer> trailerList = new ArrayList<>();
+    private List<Review> reviewList = new ArrayList<>();
 
 
     @Override
@@ -82,24 +85,35 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             public void onChanged(List<Trailer> trailers) {
                 trailerAdapter.setTrailerList(trailers);
                 trailerList = trailers;
+
             }
         });
         viewModel.reviewsList.observe(this, new Observer<List<Review>>() {
             @Override
             public void onChanged(List<Review> reviews) {
-                Log.d(TAG, "onChanged: tamanho de reviews: " + reviews.size());
-                Log.d(TAG, "onChanged: reviewer: " + reviews.get(0).getAuthor());
+                reviewAdapter.setReviewList(reviews);
+                reviewList = reviews;
+
             }
         });
 
     }
 
     private void initAdapters() {
+        // Initializing The Trailer Adapter
         trailerAdapter = new TrailerAdapter(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         binding.trailerRecycler.setLayoutManager(layoutManager);
         binding.trailerRecycler.setHasFixedSize(true);
         binding.trailerRecycler.setAdapter(trailerAdapter);
+
+        // Initializing The Reviews Adapter
+        reviewAdapter = new ReviewAdapter(this);
+        LinearLayoutManager layoutManager1 = new LinearLayoutManager(this);
+        binding.reviewRecycler.setLayoutManager(layoutManager1);
+        binding.reviewRecycler.setHasFixedSize(true);
+        binding.reviewRecycler.setAdapter(reviewAdapter);
+
     }
 
     @Override
@@ -125,7 +139,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private void shareMovie() {
         Intent i = new Intent(Intent.ACTION_SEND);
         String firstTrailer = "https://www.youtube.com/watch?v=" + trailerList.get(0).getKey();
-        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.movie_sharing) + " "+firstTrailer);
+        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.movie_sharing) + " " + firstTrailer);
         i.setType("text/plain");
         if (i.resolveActivity(getPackageManager()) != null) {
             startActivity(Intent.createChooser(i, getString(R.string.share_using)));
@@ -143,4 +157,11 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         startActivity(i);
     }
 
+    @Override
+    public void onReviewItemClick(int position) {
+        Review review = reviewList.get(position);
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(review.getUrl()));
+        startActivity(i);
+    }
 }
