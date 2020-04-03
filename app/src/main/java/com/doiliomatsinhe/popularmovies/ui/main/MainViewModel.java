@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.doiliomatsinhe.popularmovies.model.Movie;
-import com.doiliomatsinhe.popularmovies.model.MovieRepository;
+import com.doiliomatsinhe.popularmovies.data.MovieRepository;
 import com.doiliomatsinhe.popularmovies.model.MovieResponse;
 
 import java.util.ArrayList;
@@ -21,9 +21,8 @@ public class MainViewModel extends ViewModel {
 
     private MovieRepository repository;
     private MutableLiveData<List<Movie>> _movieList = new MutableLiveData<>();
-    //public LiveData<List<Movie>> movieList = _movieList; will use this in the future.
 
-    public String filter;
+    private String filter;
 
     public String getFilter() { return filter; }
 

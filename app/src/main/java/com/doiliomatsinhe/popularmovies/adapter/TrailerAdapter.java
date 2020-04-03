@@ -28,7 +28,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TrailerItemBinding binding;
 
-        public ViewHolder(@NonNull TrailerItemBinding binding) {
+        ViewHolder(@NonNull TrailerItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             binding.getRoot().setOnClickListener(this);

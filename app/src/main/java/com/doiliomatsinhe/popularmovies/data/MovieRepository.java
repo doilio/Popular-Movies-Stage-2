@@ -1,6 +1,9 @@
-package com.doiliomatsinhe.popularmovies.model;
+package com.doiliomatsinhe.popularmovies.data;
 
 
+import com.doiliomatsinhe.popularmovies.model.MovieResponse;
+import com.doiliomatsinhe.popularmovies.model.ReviewResponse;
+import com.doiliomatsinhe.popularmovies.model.TrailerResponse;
 import com.doiliomatsinhe.popularmovies.network.APIService;
 import com.doiliomatsinhe.popularmovies.network.ServiceBuilder;
 

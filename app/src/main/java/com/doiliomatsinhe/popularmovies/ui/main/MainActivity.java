@@ -17,7 +17,7 @@ import com.doiliomatsinhe.popularmovies.R;
 import com.doiliomatsinhe.popularmovies.adapter.MovieAdapter;
 import com.doiliomatsinhe.popularmovies.databinding.ActivityMainBinding;
 import com.doiliomatsinhe.popularmovies.model.Movie;
-import com.doiliomatsinhe.popularmovies.model.MovieRepository;
+import com.doiliomatsinhe.popularmovies.data.MovieRepository;
 import com.doiliomatsinhe.popularmovies.ui.detail.DetailActivity;
 
 import java.util.ArrayList;

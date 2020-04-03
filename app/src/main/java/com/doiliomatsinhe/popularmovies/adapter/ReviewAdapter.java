@@ -25,7 +25,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ReviewItemBinding binding;
 
-        public ViewHolder(@NonNull ReviewItemBinding binding) {
+        ViewHolder(@NonNull ReviewItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             binding.getRoot().setOnClickListener(this);

@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.doiliomatsinhe.popularmovies.model.MovieRepository;
+import com.doiliomatsinhe.popularmovies.data.MovieRepository;
 import com.doiliomatsinhe.popularmovies.model.Review;
 import com.doiliomatsinhe.popularmovies.model.ReviewResponse;
 import com.doiliomatsinhe.popularmovies.model.Trailer;
@@ -34,6 +34,11 @@ public class DetailViewModel extends ViewModel {
         getReviews(movieId);
     }
 
+    /**
+     * Gets a list of Reviews by making an Asynchronous call with Retrofit.
+     * @param movieId identifies a movie uniquely and returns data about it
+     *
+     */
     private void getReviews(int movieId) {
         repository.getReviews(movieId).enqueue(new Callback<ReviewResponse>() {
             @Override
@@ -52,6 +57,11 @@ public class DetailViewModel extends ViewModel {
         });
     }
 
+    /**
+     * Gets a list of Trailers by making an Asynchronous call with Retrofit.
+     * @param movieId identifies a movie uniquely and returns data about it
+     *
+     */
     private void getTrailers(int movieId) {
         repository.getTrailers(movieId).enqueue(new Callback<TrailerResponse>() {
             @Override

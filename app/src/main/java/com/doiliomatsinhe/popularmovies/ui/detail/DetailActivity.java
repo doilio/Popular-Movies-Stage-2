@@ -21,7 +21,7 @@ import com.doiliomatsinhe.popularmovies.adapter.ReviewAdapter;
 import com.doiliomatsinhe.popularmovies.adapter.TrailerAdapter;
 import com.doiliomatsinhe.popularmovies.databinding.ActivityDetailBinding;
 import com.doiliomatsinhe.popularmovies.model.Movie;
-import com.doiliomatsinhe.popularmovies.model.MovieRepository;
+import com.doiliomatsinhe.popularmovies.data.MovieRepository;
 import com.doiliomatsinhe.popularmovies.model.Review;
 import com.doiliomatsinhe.popularmovies.model.Trailer;
 import com.squareup.picasso.Picasso;
@@ -34,7 +34,6 @@ import static com.doiliomatsinhe.popularmovies.ui.main.MainActivity.MOVIE;
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerItemClickListener, ReviewAdapter.ReviewItemClickListener {
 
     private ActivityDetailBinding binding;
-    private static final String TAG = "DetailActivity";
     private TrailerAdapter trailerAdapter;
     private ReviewAdapter reviewAdapter;
 
@@ -47,7 +46,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
-
         Intent i = getIntent();
         if (i != null) {
             Movie movie = (Movie) i.getSerializableExtra(MOVIE);
@@ -58,6 +56,10 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
 
+    /**
+     * Populates the UI with Movie Details
+     * @param movie to use to populate fields
+     */
     private void populateUI(Movie movie) {
         Log.d("DetailActivity", "populateUI: " + movie.getId());
         Picasso.get().load(movie.getBackdropPath()).into(binding.movieCover);
@@ -74,12 +76,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
 
     private void prepareDetailViewModel(Integer id) {
+
+        // Initializes the ViewModel
         MovieRepository repository = new MovieRepository(getString(R.string.api_key));
         DetailViewModelFactory factory = new DetailViewModelFactory(repository, id);
         DetailViewModel viewModel = new ViewModelProvider(this, factory).get(DetailViewModel.class);
 
         initAdapters();
 
+        // Gets the List of trailers as livedata
         viewModel.trailersList.observe(this, new Observer<List<Trailer>>() {
             @Override
             public void onChanged(List<Trailer> trailers) {
@@ -88,6 +93,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
             }
         });
+
+        // Gets the List of reviews as livedata
         viewModel.reviewsList.observe(this, new Observer<List<Review>>() {
             @Override
             public void onChanged(List<Review> reviews) {
@@ -136,6 +143,9 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Metthod to share first Trailer
+     */
     private void shareMovie() {
         Intent i = new Intent(Intent.ACTION_SEND);
         String firstTrailer = "https://www.youtube.com/watch?v=" + trailerList.get(0).getKey();
@@ -146,22 +156,36 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         }
     }
 
+    /**
+     * Checks if The Youtube App is Installed.
+     * If it is it opens the link through the App
+     * Else it opens through the browser
+     * @param position of current item
+     */
     @Override
     public void onTrailerItemClick(int position) {
         Trailer trailer = trailerList.get(position);
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(String.format("https://www.youtube.com/watch?v=%s", trailer.getKey())));
-        if (Utils.isAppInstalled(this, "com.google.android.youtube")) {
-            i.setPackage("com.google.android.youtube");
+        if (Utils.isAppInstalled(this, getString(R.string.youtube_app_name))) {
+            i.setPackage(getString(R.string.youtube_app_name));
         }
         startActivity(i);
     }
 
+
+    /**
+     * CLICKING STOPPED WORKING after replacing <ScrollView> with <NestedScrollView>
+     * this was used to open the full Review on the browser.
+     */
     @Override
     public void onReviewItemClick(int position) {
+
         Review review = reviewList.get(position);
+        Log.d("TESTE",review.getUrl());
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(review.getUrl()));
         startActivity(i);
+
     }
 }

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.doiliomatsinhe.popularmovies.model.MovieRepository;
+import com.doiliomatsinhe.popularmovies.data.MovieRepository;
 
 public class DetailViewModelFactory implements ViewModelProvider.Factory {
 
